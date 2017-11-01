@@ -1,5 +1,5 @@
-#from ipykernel.kernelbase import Kernel
-from IPython.kernel.zmq.kernelbase import Kernel
+from ipykernel.kernelbase import Kernel
+#from IPython.kernel.zmq.kernelbase import Kernel
 import re
 
 def match(var):
@@ -31,8 +31,8 @@ class JavaKernel(Kernel):
                 'payload': [],
                 'user_expressions': {},
                }
-            
-    
+
+
     def do_complete(self, code, cursor_pos):
             
         v = ["int aef_er = 10", "string cer = 'fdsf'", "float f565 = 4.567", "int i = 6", "int aef_er1 = 10"]
@@ -57,8 +57,29 @@ class JavaKernel(Kernel):
         }
         
         return content
+        
+    def do_inspect(self, code, cursor_pos, detail_level=0):
+        """Override in subclasses to allow introspection.
+        """
+        return {'status': 'ok', 'data': {code : "Oh, that's great command!"}, 'metadata': {}, 'found': True}
       	
-
+    def do_history(self, hist_access_type, output, raw, session=None, start=None, stop=None, n=None, pattern=None, unique=False):
+        """Override in subclasses to access history.
+        """
+        return {'status': 'ok', 'history': []}
+        
+    def do_shutdown(self, restart):
+        """
+        Override in subclasses to do things when the frontend shuts down the
+        kernel.
+        """
+        return {'status': 'ok', 'restart': restart}
+     
+    def do_is_complete(self, code):
+        """Override in subclasses to find completions.
+        """
+        return {'status' : 'incomplete', 'indent' : '!>##$$##>>'}
+    
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
     IPKernelApp.launch_instance(kernel_class=JavaKernel)
