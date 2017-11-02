@@ -8,6 +8,21 @@ def match(var):
                 find = re.findall(r'\w+', v)[1]
                 res.append(find)
             return res
+
+def search(var, mask):
+    mask = "^"+mask
+    res = []
+    for v in var:
+        find = re.search(mask, v)
+        if find is not None:
+            res.append(v)
+    return res
+            
+def last_word(var):
+    result = re.findall(r'\w+$', var)
+    return result[0]
+            
+
             
 class JavaKernel(Kernel):
     #def __init__(self):
@@ -34,9 +49,12 @@ class JavaKernel(Kernel):
 
 
     def do_complete(self, code, cursor_pos):
-            
+
         v = ["int aef_er = 10", "string cer = 'fdsf'", "float f565 = 4.567", "int i = 6", "int aef_er1 = 10"]
         v = match(v)
+        code = last_word(code)
+        v = search(v,code)
+
         content = {
             # The list of all matches to the completion request, such as
             # ['a.isalnum', 'a.isalpha'] for the above example.
@@ -44,7 +62,7 @@ class JavaKernel(Kernel):
 
             # The range of text that should be replaced by the above matches when a completion is accepted.
             # typically cursor_end is the same as cursor_pos in the request.
-            'cursor_start' : cursor_pos,
+            'cursor_start' : cursor_pos - len(code),
             'cursor_end' : cursor_pos,
 
             # Information that frontend plugins might use for extra display information about completions.
@@ -55,7 +73,7 @@ class JavaKernel(Kernel):
             # in other messages.
             'status' : 'ok'
         }
-        
+
         return content
         
     def do_inspect(self, code, cursor_pos, detail_level=0):
