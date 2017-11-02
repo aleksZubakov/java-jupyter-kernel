@@ -1,10 +1,9 @@
-
-import jdk.jshell.JShell;
-import jdk.jshell.SnippetEvent;
-import jdk.jshell.SourceCodeAnalysis;
+import jdk.jshell.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class JShellWrapper {
     private JShell jShell;
@@ -13,16 +12,8 @@ public class JShellWrapper {
 
 
     static public void main(String[] args) {
-
         JShellWrapper js = new JShellWrapper();
-        System.out.println(js.runCommand("3+4"));
-        System.out.println();
-        System.out.println(js.runCommand("int a = 4;"));
-        System.out.println();
         System.out.println(js.runCommand("3+;"));
-        System.out.println();
-        //        System.out.println(js.runCommand("int b = a;;"));
-
     }
     public JShellWrapper() {
         jShell = JShell.builder().err(System.out).build();
@@ -35,22 +26,27 @@ public class JShellWrapper {
 
     public String runCommand(String command) {
 
-        List<SnippetEvent> res = this.eval(command);
-//        try {
-//            res = this.eval(command);
-//        } catch (IllegalStateException e) {
-//            System.out.println(e);
-//            e.printStackTrace();
-//
-//            return "";
-//        }
+        SnippetEvent res = this.eval(command).get(0);
 
-        System.out.println(res.get(0).exception());
-        return res.toString();
-//        if (Snippet.Status.REJECTED.equals(res.status())) {
-//        }
+//        System.out.println(res.get(0).exception());
+//        return res.toString();
+        if (Snippet.Status.REJECTED.equals(res.status())) {
+            List<Diag> diags = jShell.diagnostics(res.snippet()).collect(Collectors.toList());
+            
+//            String err = "";
+            StringBuilder buf = new StringBuilder();
+            for (Diag d: diags
+                 ) {
+                buf.append("Error :\n");
+                buf.append(d.getMessage(Locale.US));
+//                " ".repeat(3);
+//                if (buf.append())
+                buf.append("\n");
+            }
+            return buf.toString();
+        }
 
-//        return res.value();
+        return res.value();
     }
 
 
