@@ -60,7 +60,7 @@ class JavaKernel(Kernel):
 
     def __init__(self, **kwargs):
         super(JavaKernel, self).__init__(**kwargs)
-
+        self.__sdasd = Popen()
         self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=25333))\
             .jvm.JShellWrapper()
 
@@ -110,6 +110,8 @@ class JavaKernel(Kernel):
 
         return content
 
+        def do_shutdown(self, restart):
+            pass
 
 if __name__ == '__main__':
 

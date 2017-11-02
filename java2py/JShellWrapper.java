@@ -1,35 +1,56 @@
 
 import jdk.jshell.JShell;
-import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 import jdk.jshell.SourceCodeAnalysis;
 
-
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class JShellWrapper {
     private JShell jShell;
     private SourceCodeAnalysis srcAnalyzer;
 
 
+
+    static public void main(String[] args) {
+
+        JShellWrapper js = new JShellWrapper();
+        System.out.println(js.runCommand("3+4"));
+        System.out.println();
+        System.out.println(js.runCommand("int a = 4;"));
+        System.out.println();
+        System.out.println(js.runCommand("3+;"));
+        System.out.println();
+        //        System.out.println(js.runCommand("int b = a;;"));
+
+    }
     public JShellWrapper() {
-        jShell = JShell.create();
+        jShell = JShell.builder().err(System.out).build();
         srcAnalyzer = jShell.sourceCodeAnalysis();
     }
 
-    public SnippetEvent eval(String command) {
-        return jShell.eval(command + ";").get(0);
+    private List<SnippetEvent> eval(String command) {
+        return jShell.eval(command + ";");
     }
 
     public String runCommand(String command) {
-        SnippetEvent res = this.eval(command);
 
-        if (Snippet.Status.REJECTED.equals(res.status())) {
-            return "Evaluation failed: " + res.snippet().toString();
-        }
-        return res.value();
+        List<SnippetEvent> res = this.eval(command);
+//        try {
+//            res = this.eval(command);
+//        } catch (IllegalStateException e) {
+//            System.out.println(e);
+//            e.printStackTrace();
+//
+//            return "";
+//        }
+
+        System.out.println(res.get(0).exception());
+        return res.toString();
+//        if (Snippet.Status.REJECTED.equals(res.status())) {
+//        }
+
+//        return res.value();
     }
 
 
