@@ -21,12 +21,18 @@ def search(var, mask):
 def last_word(var):
     result = re.findall(r'\w+$', var)
     return result[0]
-            
 
-            
+def get_lexems(code):
+    return re.findall(r'\w+', code);
+    
+
 class JavaKernel(Kernel):
-    #def __init__(self):
+    lexems = []
+    
+    #def __init__(self, profile_dir, log, session, stdin_socket, parent, shell_streams, iopub_socket, iopub_thread, user_ns): 
+    #    lexems = []  
     #    pass
+    
     implementation = 'Python'
     implementation_version = '1.0'
     language = 'Java'
@@ -36,6 +42,8 @@ class JavaKernel(Kernel):
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
+        self.lexems += get_lexems(code);
+        self.lexems = list(set(self.lexems))
         if not silent:
             stream_content = {'name': 'stdout', 'text': "hello"}
             self.send_response(self.iopub_socket, 'stream', stream_content)
@@ -50,8 +58,11 @@ class JavaKernel(Kernel):
 
     def do_complete(self, code, cursor_pos):
 
-        v = ["int aef_er = 10", "string cer = 'fdsf'", "float f565 = 4.567", "int i = 6", "int aef_er1 = 10"]
-        v = match(v)
+        #v = ["int aef_er = 10", "string cer = 'fdsf'", "float f565 = 4.567", "int i = 6", "int aef_er1 = 10"]
+        
+        v = self.lexems
+            
+        #v = match(v)
         code = last_word(code)
         v = search(v,code)
 
@@ -92,11 +103,11 @@ class JavaKernel(Kernel):
         kernel.
         """
         return {'status': 'ok', 'restart': restart}
-     
+
     def do_is_complete(self, code):
         """Override in subclasses to find completions.
         """
-        return {'status' : 'incomplete', 'indent' : '!>##$$##>>'}
+        return {'status' : 'complete', 'indent' : '!>##$$##>>'}
     
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
