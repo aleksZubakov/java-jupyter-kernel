@@ -1,5 +1,5 @@
 from ipykernel.kernelbase import Kernel
-#from IPython.kernel.zmq.kernelbase import Kernel
+# from IPython.kernel.zmq.kernelbase import Kernel
 import re
 
 def match(var):
@@ -9,6 +9,7 @@ def match(var):
                 res.append(find)
             return res
 
+
 def search(var, mask):
     mask = "^"+mask
     res = []
@@ -17,35 +18,52 @@ def search(var, mask):
         if find is not None:
             res.append(v)
     return res
-            
+
+
 def last_word(var):
     result = re.findall(r'\w+$', var)
     return result[0]
 
-def get_lexems(code):
-    return re.findall(r'\w+', code);
-    
+def generate(k,code):
+    if(k==0):
+        return [match([code])[0] + " ==> " + "44\n",1]
+    if(k==1):
+        return [match([code])[0] + " ==> " + "20.0\n",1]
+    if(k==2):
+        return [match([code])[0] + " ==> " + "'Hello'\n",1]
+    if(k==3):
+        return [match([code])[0] + " ==> " + "' world!'\n",1]
+    if(k==4):
+        return ["Hello world!\n", 0]
+    if(k==5):
+        res = ""
+        for i in range(10):
+            res += str(i) + '\n'
+        return [res]
+
+
+i = 0
+names = []
+
 
 class JavaKernel(Kernel):
-    lexems = []
-    
-    #def __init__(self, profile_dir, log, session, stdin_socket, parent, shell_streams, iopub_socket, iopub_thread, user_ns): 
-    #    lexems = []  
-    #    pass
-    
+    # def __init__(self):
+    #    self.__v = []
+    #    self.__g = generate()
+
     implementation = 'Python'
     implementation_version = '1.0'
     language = 'Java'
     language_version = 'Java 9'
     language_info = {'mimetype': 'text/plain'}
     banner = "Java kernel for Jupyter"
-
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
-        self.lexems += get_lexems(code);
-        self.lexems = list(set(self.lexems))
         if not silent:
-            stream_content = {'name': 'stdout', 'text': "hello"}
+            global i
+            v = generate(i,code)
+            stream_content = {'name': 'stdout', 'text': v[0]}
+            i += 1
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
         return {'status': 'ok',
@@ -55,16 +73,21 @@ class JavaKernel(Kernel):
                 'user_expressions': {},
                }
 
+    # def get_completions(self, info):
+    #     """
+    #     Get command-line completions (TAB):
+    #     """
+    #     token = info["help_obj"]
+    #     matches = ["int aef_er = 10", "string cer = 'fdsf'", "float f565 = 4.567", "int i = 6", "int aef_er1 = 10"]
+    #     return matches
 
     def do_complete(self, code, cursor_pos):
 
-        #v = ["int aef_er = 10", "string cer = 'fdsf'", "float f565 = 4.567", "int i = 6", "int aef_er1 = 10"]
-        
-        v = self.lexems
-            
-        #v = match(v)
+        v = ["test1", "test2"]
+        # v = match(v)
         code = last_word(code)
         v = search(v,code)
+        v = [code] + v
 
         content = {
             # The list of all matches to the completion request, such as
@@ -86,29 +109,8 @@ class JavaKernel(Kernel):
         }
 
         return content
-        
-    def do_inspect(self, code, cursor_pos, detail_level=0):
-        """Override in subclasses to allow introspection.
-        """
-        return {'status': 'ok', 'data': {code : "Oh, that's great command!"}, 'metadata': {}, 'found': True}
-      	
-    def do_history(self, hist_access_type, output, raw, session=None, start=None, stop=None, n=None, pattern=None, unique=False):
-        """Override in subclasses to access history.
-        """
-        return {'status': 'ok', 'history': []}
-        
-    def do_shutdown(self, restart):
-        """
-        Override in subclasses to do things when the frontend shuts down the
-        kernel.
-        """
-        return {'status': 'ok', 'restart': restart}
 
-    def do_is_complete(self, code):
-        """Override in subclasses to find completions.
-        """
-        return {'status' : 'complete', 'indent' : '!>##$$##>>'}
-    
+
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
     IPKernelApp.launch_instance(kernel_class=JavaKernel)
