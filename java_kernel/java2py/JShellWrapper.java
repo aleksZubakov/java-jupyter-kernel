@@ -1,6 +1,7 @@
 import jdk.jshell.*;
 
 import java.util.*;
+import java.util.stream.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
@@ -105,6 +106,35 @@ public class JShellWrapper {
         }
 //        System.out.println(buf.toString());
         return buf.toString();
+    }
+
+
+    public String getVariables(){
+      List<VarSnippet> vars = jShell.variables().collect(Collectors.toList());
+
+      StringBuilder result = new StringBuilder();
+      for (VarSnippet v: vars){
+        result.append(v.typeName());
+        result.append(" ");
+        result.append(v.name());
+        result.append(" = ");
+        result.append(jShell.varValue​(v));
+        result.append("\n");
+      }
+      return result.toString();
+    }
+
+    public String getMethods(){
+      List<MethodSnippet> methods = jShell.methods().collect(Collectors.toList());
+      StringBuilder result = new StringBuilder();
+
+      for (MethodSnippet m: methods){
+        result.append(m.name​());
+        result.append(" ");
+        result.append(m.signature​());
+        result.append("\n");
+      }
+      return result.toString();
     }
 
     public boolean isComplete(String msg) {
