@@ -45,6 +45,8 @@ class JavaKernel(Kernel):
             self.history = (self.history)[-255:]
             if code == r'%h':
                 stream_content = {'name': 'stdout', 'text': '\n'.join(self.history)}
+            elif code == r'/vars':
+                stream_content = {'name': 'stdout', 'text': self.__java_bridge.getVariables()}
             else:
                 stream_content = {'name': 'stdout', 'text': self.__java_bridge.runCommand(code)}
 
