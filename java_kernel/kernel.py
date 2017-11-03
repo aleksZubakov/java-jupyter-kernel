@@ -26,8 +26,9 @@ class JavaKernel(Kernel):
                 break
             port += 1
 
-        self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " + str(port),
-        shell = True)
+        self.__sp = subprocess.\
+            Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " \
+            + str(port), shell = True)
         time.sleep(5)
 
         self.history = ['']
@@ -36,7 +37,7 @@ class JavaKernel(Kernel):
 
     def __last_word(self, var):
         result = re.findall(r'\w+$', var)
-        return result[0]
+        return '' if not result else result[0]
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
@@ -46,7 +47,7 @@ class JavaKernel(Kernel):
             if code == r'%h':
                 stream_content = {'name': 'stdout', 'text': '\n'.join(self.history)}
             else:
-                stream_content = {'name': 'stdout', 'text': self.__java_bridge.runCommand(code)}
+                stream_content = {'name': 'stdout', 'text': self.__java_bridge.evalSnippet(code)}
 
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
@@ -64,7 +65,10 @@ class JavaKernel(Kernel):
 
     def do_complete(self, code, cursor_pos):
         mask = self.__last_word(code)
-        v = self.__java_bridge.getSuggestions(code, cursor_pos).split("\n")[:-1]
+        if not mask:
+            v = []
+        else:
+            v = self.__java_bridge.getSuggestions(code, cursor_pos).split("\n")[:-1]
         content = {
             'matches': v,
             'cursor_start': cursor_pos - len(mask),
@@ -76,6 +80,7 @@ class JavaKernel(Kernel):
         return content
 
     def do_shutdown(self, restart):
+        # self.__java_bridge.shutdown()
         self.__sp.kill()
 
 

@@ -10,47 +10,45 @@ public class JShellWrapper {
     private JShell jShell;
     private SourceCodeAnalysis srcAnalyzer;
 
-
-
     static public void main(String[] args) {
         JShellWrapper js = new JShellWrapper();
-        System.out.println(js.runCommand("3 >\na + a"));
-        System.out.println(js.runCommand("3+;"));
-        System.out.println(js.runCommand("int abc = 2;"));
-        System.out.println(js.runCommand("int abe = 10;"));
-        System.out.println(js.runCommand("int abo = 3;"));
-        System.out.println(js.runCommand("abo"));
-        String snippet = "ab";
-
-        System.out.println(js.getSuggestions(snippet, 0));
+        System.out.println(js.evalSnippet("char a = 'a';"));
+        System.out.println(js.evalSnippet("int abc = 3; int bas = 3; String a = \";\"; char b = ';';"));
     }
     public JShellWrapper() {
         jShell = JShell.builder().err(System.out).build();
         srcAnalyzer = jShell.sourceCodeAnalysis();
+
     }
 
     private List<SnippetEvent> eval(String code) {
-        return jShell.eval(code + ";");
+        return jShell.eval(code);
     }
 
-    public String runCommand(String code) {
+    public String evalSnippet(String code) {
+        String[] commands = code.split(";(?=([^\"]*\"[^\"]*\")*[^\"]*$)(?=[^'][^;][^'])");
 
-        SnippetEvent res= this.eval(code).get(0);
+        StringBuilder evalResult = new StringBuilder();
+        for (String cmd: commands) {
+            boolean ifErr[] = {false};
+            String cmdResult = runCommand(cmd + ";", ifErr);
+            if (ifErr[0]) {
+                return cmdResult;
+            }
+
+            evalResult.append(cmdResult);
+            evalResult.append("\n");
+        }
+        return evalResult.toString();
+    }
+
+    private String runCommand(String code, boolean ifErr[]) {
+        SnippetEvent res = this.eval(code).get(0);
+
         String codeLines[] = code.split("\\r?\\n");
-//        List<String> codeLines = new ArrayList<>();
-//        StringBuilder buf = new StringBuilder();
-//
-//        for (String line: codeLines
-//             ) {
-//            if (this.isComplete(buf.toString())) {
-//                codeLines.add(buf.toString());
-//                buf.setLength(0);
-//            }
-//
-//        }
-
 
         if (Snippet.Status.REJECTED.equals(res.status())) {
+            ifErr[0] = true;
             List<Diag> diags = jShell.diagnostics(res.snippet()).collect(Collectors.toList());
 
             StringBuilder errBuf = new StringBuilder();
@@ -68,7 +66,6 @@ public class JShellWrapper {
                 errBuf.append("\n");
 
                 long cursorPosition = d.getPosition();
-//                System.out.println();
                 while (alreadyPassed + codeLines[lineNum].length() < cursorPosition) {
                     alreadyPassed += codeLines[lineNum++].length();
                     extraSymbols++;
@@ -97,7 +94,7 @@ public class JShellWrapper {
 
         int ar[] = {1};
         List<SourceCodeAnalysis.Suggestion> suggestions = srcAnalyzer.completionSuggestions(code, cursor, ar);
-        buf.append(ar[0]);
+      //   buf.append(ar[0]);
         for (SourceCodeAnalysis.Suggestion sug: suggestions
              ) {
             buf.append(sug.continuation());
