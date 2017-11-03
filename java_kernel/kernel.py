@@ -27,11 +27,13 @@ class JavaKernel(Kernel):
             port += 1
 
         self.__sp = subprocess.\
-            Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " \
+            Popen("java -classpath bin:target/jserver-jar-with-dependencies.jar JavaBridge " \
             + str(port), shell = True)
         time.sleep(5)
 
         self.history = ['']
+        self.history_command = re.compile(r'^\s*/history\s*$')
+        
         self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=port)) \
             .jvm.JShellWrapper()
 
@@ -44,7 +46,7 @@ class JavaKernel(Kernel):
         if not silent:
             self.history.append(code)
             self.history = (self.history)[-255:]
-            if code == r'%h':
+            if self.history_command.match(code):
                 stream_content = {'name': 'stdout', 'text': '\n'.join(self.history)}
             elif code == r'/vars':
                 stream_content = {'name': 'stdout', 'text': self.__java_bridge.getVariables()}
