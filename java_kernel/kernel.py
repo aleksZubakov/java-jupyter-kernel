@@ -26,7 +26,8 @@ class JavaKernel(Kernel):
                 break
             port += 1
 
-        self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " + str(port),
+        #self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " + str(port),
+        self.__sp = subprocess.Popen("java -classpath bin:target/jserver-jar-with-dependencies.jar JavaBridge " + str(port),
         shell = True)
         time.sleep(5)
 
