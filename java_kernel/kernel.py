@@ -1,6 +1,8 @@
 from ipykernel.kernelbase import Kernel
 # from IPython.kernel.zmq.kernelbase import Kernel
 import re
+import time
+import subprocess
 
 from py4j.java_gateway import JavaGateway, GatewayParameters
 
@@ -15,6 +17,12 @@ class JavaKernel(Kernel):
 
     def __init__(self, **kwargs):
         super(JavaKernel, self).__init__(**kwargs)
+
+        self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar Py4JExample",
+        shell = True)
+
+        time.sleep(5)
+
         self.history = ['']
         self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=25333)) \
             .jvm.JShellWrapper()
@@ -61,11 +69,10 @@ class JavaKernel(Kernel):
 
         return content
 
-        def do_shutdown(self, restart):
-            pass
+    def do_shutdown(self, restart):
+        self.__sp.kill()
 
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp
-
     IPKernelApp.launch_instance(kernel_class=JavaKernel)
