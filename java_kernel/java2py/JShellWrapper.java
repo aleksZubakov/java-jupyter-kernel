@@ -111,7 +111,7 @@ public class JShellWrapper {
 
     public String getVariables(){
       List<VarSnippet> vars = jShell.variables().collect(Collectors.toList());
-      
+
       StringBuilder result = new StringBuilder();
       for (VarSnippet v: vars){
         result.append(v.typeName());
@@ -119,7 +119,20 @@ public class JShellWrapper {
         result.append(v.name());
         result.append(" = ");
         result.append(jShell.varValue​(v));
-        result.append(";\n");
+        result.append("\n");
+      }
+      return result.toString();
+    }
+
+    public String getMethods(){
+      List<MethodSnippet> methods = jShell.methods().collect(Collectors.toList());
+      StringBuilder result = new StringBuilder();
+
+      for (MethodSnippet m: methods){
+        result.append(m.name​());
+        result.append(" ");
+        result.append(m.signature​());
+        result.append("\n");
       }
       return result.toString();
     }
