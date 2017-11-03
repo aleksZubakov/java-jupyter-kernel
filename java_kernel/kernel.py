@@ -26,9 +26,15 @@ class JavaKernel(Kernel):
                 break
             port += 1
 
+<<<<<<< HEAD
         self.__sp = subprocess.\
             Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " \
             + str(port), shell = True)
+=======
+        #self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " + str(port),
+        self.__sp = subprocess.Popen("java -classpath bin:target/jserver-jar-with-dependencies.jar JavaBridge " + str(port),
+        shell = True)
+>>>>>>> bc9cf7f60dd2c20eee4b43926555d7d87eb666ec
         time.sleep(5)
 
         self.history = ['']
@@ -46,6 +52,10 @@ class JavaKernel(Kernel):
             self.history = (self.history)[-255:]
             if code == r'%h':
                 stream_content = {'name': 'stdout', 'text': '\n'.join(self.history)}
+            elif code == r'/vars':
+                stream_content = {'name': 'stdout', 'text': self.__java_bridge.getVariables()}
+            elif code == r'/methods':
+                stream_content = {'name': 'stdout', 'text': self.__java_bridge.getMethods()}
             else:
                 stream_content = {'name': 'stdout', 'text': self.__java_bridge.evalSnippet(code)}
 
