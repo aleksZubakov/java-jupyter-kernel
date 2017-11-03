@@ -3,6 +3,7 @@ from ipykernel.kernelbase import Kernel
 import re
 import time
 import subprocess
+import socket
 
 from py4j.java_gateway import JavaGateway, GatewayParameters
 
@@ -17,14 +18,20 @@ class JavaKernel(Kernel):
 
     def __init__(self, **kwargs):
         super(JavaKernel, self).__init__(**kwargs)
+        port = 25222
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while(True):
+            result = sock.connect_ex(('127.0.0.1',port))
+            if result != 0:
+                break
+            port += 1
 
-        self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar Py4JExample",
+        self.__sp = subprocess.Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " + str(port),
         shell = True)
-
         time.sleep(5)
 
         self.history = ['']
-        self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=25333)) \
+        self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=port)) \
             .jvm.JShellWrapper()
 
     def __last_word(self, var):
@@ -57,8 +64,7 @@ class JavaKernel(Kernel):
 
     def do_complete(self, code, cursor_pos):
         mask = self.__last_word(code)
-        v = self.__java_bridge.getSuggestions(mask, 1)
-
+        v = self.__java_bridge.getSuggestions(code, cursor_pos).split("\n")[:-1]
         content = {
             'matches': v,
             'cursor_start': cursor_pos - len(mask),
