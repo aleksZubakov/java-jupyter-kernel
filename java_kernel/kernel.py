@@ -15,7 +15,7 @@ class JavaKernel(Kernel):
 
     def __init__(self, **kwargs):
         super(JavaKernel, self).__init__(**kwargs)
-        self.history = ''
+        self.history = ['']
         self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=25333)) \
             .jvm.JShellWrapper()
 
@@ -26,9 +26,10 @@ class JavaKernel(Kernel):
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
         if not silent:
-            self.history += '\n' + code
+            self.history.append(code)
+            self.history = (self.history)[-255:]
             if code == r'%h':
-                stream_content = {'name': 'stdout', 'text': self.history}
+                stream_content = {'name': 'stdout', 'text': '\n'.join(self.history)}
             else:
                 stream_content = {'name': 'stdout', 'text': self.__java_bridge.runCommand(code)}
 
