@@ -10,6 +10,7 @@ from collections import deque
 from py4j.java_gateway import JavaGateway, GatewayParameters
 from py4j.protocol import Py4JNetworkError
 
+
 class JavaKernel(Kernel):
     implementation = 'Python'
     implementation_version = '1.0'
@@ -30,14 +31,19 @@ class JavaKernel(Kernel):
             port += 1
 
         self.__sp = subprocess. \
-            Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " \
-                  + str(port), shell=True)
+            Popen("java "
+                  "-classpath bin:target/jserver-jar-with-dependencies.jar "
+                  "JavaBridge" +
+                  str(port), shell=True)
 
-        self.history = deque(maxlen=256)
         time.sleep(5)
 
-        self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=port))
-        self.__jshell_wrapper = self.__java_bridge.jvm.JShellWrapper()
+        self.history = deque(maxlen=256)
+        self.history_command = re.compile(r'^\s*/history\s*$')
+
+        self.__java_bridge = JavaGateway(
+            gateway_parameters=GatewayParameters(port=port)) \
+            .jvm.JShellWrapper()
 
     def __last_word(self, var):
         result = re.findall(r'\w+$', var)
@@ -47,7 +53,7 @@ class JavaKernel(Kernel):
                    user_expressions=None, allow_stdin=False):
         if not silent:
             self.history.append(code)
-            if code == r'%h':
+            if self.history_command.match(code):
                 stream_content = {
                     'name': 'stdout',
                     'text': '\n'.join(self.history)
@@ -55,17 +61,17 @@ class JavaKernel(Kernel):
             elif code == r'/vars':
                 stream_content = {
                     'name': 'stdout',
-                    'text': self.__jshell_wrapper.getVariables()
+                    'text': self.__java_bridge.getVariables()
                 }
             elif code == r'/methods':
                 stream_content = {
                     'name': 'stdout',
-                    'text': self.__jshell_wrapper.getMethods()
+                    'text': self.__java_bridge.getMethods()
                 }
             else:
                 stream_content = {
                     'name': 'stdout',
-                    'text': self.__jshell_wrapper.evalSnippet(code)
+                    'text': self.__java_bridge.evalSnippet(code)
                 }
 
             self.send_response(self.iopub_socket, 'stream', stream_content)
@@ -77,7 +83,7 @@ class JavaKernel(Kernel):
                 }
 
     def do_is_complete(self, code):
-        if self.__jshell_wrapper.isComplete(code):
+        if self.__java_bridge.isComplete(code):
             return {"status": "complete"}
         else:
             return {"status": "incomplete", "indent": "  "}
@@ -87,7 +93,8 @@ class JavaKernel(Kernel):
         if not mask:
             v = []
         else:
-            v = self.__jshell_wrapper.getSuggestions(code, cursor_pos).split("\n")[:-1]
+            v = self.__java_bridge.getSuggestions(code, cursor_pos). \
+                    split("\n")[:-1]
         content = {
             'matches': v,
             'cursor_start': cursor_pos - len(mask),
