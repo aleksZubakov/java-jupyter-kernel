@@ -1,5 +1,9 @@
 import jdk.jshell.*;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.*;
 import java.util.stream.Collectors;
@@ -9,15 +13,13 @@ import static java.lang.Math.toIntExact;
 
 public class JShellWrapper {
     private JShell jShell;
+    private ByteArrayOutputStream outStream;
     private SourceCodeAnalysis srcAnalyzer;
 
-    static public void main(String[] args) {
-        JShellWrapper js = new JShellWrapper();
-        System.out.println(js.evalSnippet("char a = 'a';"));
-        System.out.println(js.evalSnippet("int abc = 3; int bas = 3; String a = \";\"; char b = ';';"));
-    }
     public JShellWrapper() {
-        jShell = JShell.builder().err(System.out).build();
+        outStream = new ByteArrayOutputStream();
+        PrintStream prtStr = new PrintStream(outStream);
+        jShell = JShell.builder().out(prtStr).err(prtStr).build();
         srcAnalyzer = jShell.sourceCodeAnalysis();
 
     }
@@ -30,15 +32,29 @@ public class JShellWrapper {
         String[] commands = code.split(";(?=([^\"]*\"[^\"]*\")*[^\"]*$)(?=[^'][^;][^'])");
 
         StringBuilder evalResult = new StringBuilder();
+        StringBuilder tmpCmd = new StringBuilder();
+
         for (String cmd: commands) {
             boolean ifErr[] = {false};
-            String cmdResult = runCommand(cmd + ";", ifErr);
+
+            tmpCmd.append(cmd);
+            if (!this.isComplete(tmpCmd.toString())) {
+                tmpCmd.append(";");
+                continue;
+            }
+
+            String cmdResult = runCommand(tmpCmd.toString(), ifErr);
             if (ifErr[0]) {
                 return cmdResult;
             }
 
-            evalResult.append(cmdResult);
-            evalResult.append("\n");
+            evalResult.append(outStream.toString());
+            outStream.reset();
+            tmpCmd.setLength(0);
+            if (cmdResult.length() > 0) {
+                evalResult.append(cmdResult);
+                evalResult.append("\n");
+            }
         }
         return evalResult.toString();
     }
@@ -95,13 +111,11 @@ public class JShellWrapper {
 
         int ar[] = {1};
         List<SourceCodeAnalysis.Suggestion> suggestions = srcAnalyzer.completionSuggestions(code, cursor, ar);
-      //   buf.append(ar[0]);
         for (SourceCodeAnalysis.Suggestion sug: suggestions
              ) {
             buf.append(sug.continuation());
             buf.append("\n");
         }
-//        System.out.println(buf.toString());
         return buf.toString();
     }
 

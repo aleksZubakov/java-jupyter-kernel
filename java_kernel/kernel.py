@@ -5,8 +5,10 @@ import time
 import subprocess
 import socket
 
-from py4j.java_gateway import JavaGateway, GatewayParameters
+from collections import deque
 
+from py4j.java_gateway import JavaGateway, GatewayParameters
+from py4j.protocol import Py4JNetworkError
 
 class JavaKernel(Kernel):
     implementation = 'Python'
@@ -20,38 +22,51 @@ class JavaKernel(Kernel):
         super(JavaKernel, self).__init__(**kwargs)
         port = 25222
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while(True):
-            result = sock.connect_ex(('127.0.0.1',port))
+        while True:
+            result = sock.connect_ex(('127.0.0.1', port))
+
             if result != 0:
                 break
             port += 1
 
-        self.__sp = subprocess.\
+        self.__sp = subprocess. \
             Popen("java -classpath bin:java2py/target/py4j-0.10.6.jar JavaBridge " \
-            + str(port), shell = True)
+                  + str(port), shell=True)
+
+        self.history = deque(maxlen=256)
         time.sleep(5)
 
-        self.history = ['']
-        self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=port)) \
-            .jvm.JShellWrapper()
+        self.__java_bridge = JavaGateway(gateway_parameters=GatewayParameters(port=port))
+        self.__jshell_wrapper = self.__java_bridge.jvm.JShellWrapper()
 
     def __last_word(self, var):
         result = re.findall(r'\w+$', var)
         return '' if not result else result[0]
 
-    def do_execute(self, code, silent, store_history=True, user_expressions=None,
-                   allow_stdin=False):
+    def do_execute(self, code, silent, store_history=True,
+                   user_expressions=None, allow_stdin=False):
         if not silent:
             self.history.append(code)
-            self.history = (self.history)[-255:]
             if code == r'%h':
-                stream_content = {'name': 'stdout', 'text': '\n'.join(self.history)}
+                stream_content = {
+                    'name': 'stdout',
+                    'text': '\n'.join(self.history)
+                }
             elif code == r'/vars':
-                stream_content = {'name': 'stdout', 'text': self.__java_bridge.getVariables()}
+                stream_content = {
+                    'name': 'stdout',
+                    'text': self.__jshell_wrapper.getVariables()
+                }
             elif code == r'/methods':
-                stream_content = {'name': 'stdout', 'text': self.__java_bridge.getMethods()}
+                stream_content = {
+                    'name': 'stdout',
+                    'text': self.__jshell_wrapper.getMethods()
+                }
             else:
-                stream_content = {'name': 'stdout', 'text': self.__java_bridge.evalSnippet(code)}
+                stream_content = {
+                    'name': 'stdout',
+                    'text': self.__jshell_wrapper.evalSnippet(code)
+                }
 
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
@@ -62,7 +77,7 @@ class JavaKernel(Kernel):
                 }
 
     def do_is_complete(self, code):
-        if self.__java_bridge.isComplete(code):
+        if self.__jshell_wrapper.isComplete(code):
             return {"status": "complete"}
         else:
             return {"status": "incomplete", "indent": "  "}
@@ -72,7 +87,7 @@ class JavaKernel(Kernel):
         if not mask:
             v = []
         else:
-            v = self.__java_bridge.getSuggestions(code, cursor_pos).split("\n")[:-1]
+            v = self.__jshell_wrapper.getSuggestions(code, cursor_pos).split("\n")[:-1]
         content = {
             'matches': v,
             'cursor_start': cursor_pos - len(mask),
@@ -90,4 +105,5 @@ class JavaKernel(Kernel):
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp
+
     IPKernelApp.launch_instance(kernel_class=JavaKernel)
