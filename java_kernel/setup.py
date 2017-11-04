@@ -13,7 +13,7 @@ if __name__ == "__main__":
           install_requires=[
               "py4j",
           ],
-          data_files=[('/usr/local/share/jupyter/kernels/java', ['kernel.json'])]
+          data_files=[('/usr/local/share/jupyter/kernels/java', ['kernel.json','kernel.py'])]
  	)
     subprocess.call("mvn clean compile assembly:single",shell = True)
     print("Setup, maybe, done")
