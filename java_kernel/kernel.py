@@ -4,6 +4,7 @@ import re
 import time
 import subprocess
 import socket
+import sys
 
 from collections import deque
 
@@ -31,7 +32,7 @@ class JavaKernel(Kernel):
             port += 1
 
         self.__sp = subprocess. \
-            Popen("java -jar jserver.jar" +
+            Popen("java -jar " + sys.argv[1] + " " +
                   str(port), shell=True)
 
         time.sleep(5)

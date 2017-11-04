@@ -15,7 +15,7 @@ if __name__ == "__main__":
     
     f = open(path+'kernel.json', 'w')
     
-    f.write('{"argv":["python","'+path+'kernel.py", "-f", "{connection_file}"],"display_name":"Java"}')
+    f.write('{"argv":["python","'+path+'kernel.py", "'+path+'jserver.jar", "-f", "{connection_file}"],"display_name":"Java"}\n')
     f.close()
     
     setup(name="javaForJupyter",
