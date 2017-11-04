@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 import subprocess, re, os
 
 if __name__ == "__main__":
-    subprocess.call("mvn clean install",shell = True)
+    #subprocess.call("mvn clean install",shell = True)
     
     pth_re = re.compile(r'\S*jupyter/kernels/')
     path = pth_re.search(str(subprocess.check_output(['jupyter', 'kernelspec', 'list']))).group() + "java/"
@@ -18,8 +18,6 @@ if __name__ == "__main__":
     f.write('{"argv":["python","'+path+'kernel.py", "-f", "{connection_file}"],"display_name":"Java"}')
     f.close()
     
-    print(path)
-    
     setup(name="javaForJupyter",
           author="Devdays",
           description="A Jupyter kernel for Java.",
@@ -31,4 +29,4 @@ if __name__ == "__main__":
           data_files=[(path, ['kernel.py','target/jserver.jar'])]
  	)
     
-    print("Setup, maybe, done")
+    print("Setup, maybe, done in directory\n" + path)
