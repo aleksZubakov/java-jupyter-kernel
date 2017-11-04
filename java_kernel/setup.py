@@ -30,3 +30,4 @@ if __name__ == "__main__":
  	)
     
     print("Setup, maybe, done in directory\n" + path)
+    print("To launch Jupyter with Java kernel, type 'jupyter console --kernel java'")
