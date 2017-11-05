@@ -12,8 +12,8 @@ if __name__ == "__main__":
     try:
         path = pth_re.search(str(subprocess.check_output(['jupyter', 'kernelspec', 'list']))).group() + "java/"
     except Exception:
-        print("You should have installed Jupyter with some kernels.")
-        quit()
+        path = input("I can't find path to Jupyter kernels. (You should have installed Jupyter with some kernels.) Please, enter path, where Jupyter searcher for kernels:\n") + "/java/"
+
     if not os.path.exists(path):
     	os.makedirs(path)
 
