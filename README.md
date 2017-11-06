@@ -10,7 +10,7 @@ path manually (i.e. /usr/local/share/jupyter/kernels).
 
 
 Files in repository include file java_src/target/jserver.jar . If you want to rebuild
-it, run "mvn clean install" in directory java_kernel.
+it, run "mvn clean install" in directory java_src.
 
 ### Existing repos
 
