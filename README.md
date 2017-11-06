@@ -14,9 +14,9 @@ path manually (i.e. ```/usr/local/share/jupyter/kernels```).
 Files in repository include file ```java_src/target/jserver.jar``` . If you want to change or/and rebuild
 it, run 
 ```
+cd java_src
 mvn clean install
 ``` 
-in directory ```java_src```.
 
 ## Authors
 - [@pvktk](https://github.com/pvktk)
