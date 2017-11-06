@@ -33,6 +33,7 @@ public class JShellWrapper {
 
         StringBuilder evalResult = new StringBuilder();
         StringBuilder tmpCmd = new StringBuilder();
+        List<String> comamnds = new ArrayList<>();
 
         for (String cmd: commands) {
             boolean ifErr[] = {false};
@@ -42,6 +43,9 @@ public class JShellWrapper {
                 tmpCmd.append(";");
                 continue;
             }
+
+            if (!tmpCmd.toString().endsWith(";"))
+                tmpCmd.append(";");
 
             String cmdResult = runCommand(tmpCmd.toString(), ifErr);
             if (ifErr[0]) {
@@ -56,6 +60,9 @@ public class JShellWrapper {
                 evalResult.append("\n");
             }
         }
+
+
+
         return evalResult.toString();
     }
 

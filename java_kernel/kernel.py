@@ -33,7 +33,7 @@ class JavaKernel(Kernel):
         self.__sp = subprocess. \
             Popen("java "
                   "-classpath bin:target/jserver-jar-with-dependencies.jar "
-                  "JavaBridge" +
+                  "JavaBridge " +
                   str(port), shell=True)
 
         time.sleep(5)
