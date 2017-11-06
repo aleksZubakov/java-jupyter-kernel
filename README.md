@@ -19,6 +19,6 @@ mvn clean install
 in directory ```java_src```.
 
 ## Authors
-[@pvktk](https://github.com/pvktk)
-[@aleksZubakov](https://github.com/aleksZubakov)
-[@cripson1994](https://github.com/cripson1994)
+- [@pvktk](https://github.com/pvktk)
+- [@aleksZubakov](https://github.com/aleksZubakov)
+- [@cripson1994](https://github.com/cripson1994)
