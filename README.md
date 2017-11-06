@@ -2,8 +2,9 @@
 
 # How to install
 
-First of all, you should install Jupyter. Then launch "./setup.py install" (root
-privilegies might requried). If all goes fine, setup.py will find path,
+First of all, you should install Jupyter. 
+Then launch (root privilegies might requried)
+```./setup.py install``` If all goes fine, setup.py will find path,
 where to specify Java kernel. (It calls "jupyter kernelspec list" 
 and takes path from it.) If finding path fails, you'll be asked to specify
 path manually (i.e. /usr/local/share/jupyter/kernels).
