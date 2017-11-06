@@ -48,16 +48,12 @@ public class JShellWrapper {
                 tmpCmd.append(";");
 
             String cmdResult = runCommand(tmpCmd.toString(), ifErr);
-            if (ifErr[0]) {
-                return cmdResult;
-            }
 
             evalResult.append(outStream.toString());
             outStream.reset();
             tmpCmd.setLength(0);
             if (cmdResult.length() > 0) {
                 evalResult.append(cmdResult);
-                evalResult.append("\n");
             }
         }
 
@@ -110,7 +106,7 @@ public class JShellWrapper {
             return errBuf.toString();
         }
 
-        return res.value();
+        return "";
     }
 
     public String getSuggestions(String code, int cursor) {
