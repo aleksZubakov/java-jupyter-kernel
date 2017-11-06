@@ -4,6 +4,7 @@ import re
 import time
 import subprocess
 import socket
+import sys
 
 from collections import deque
 
@@ -30,10 +31,7 @@ class JavaKernel(Kernel):
                 break
             port += 1
 
-        self.__sp = subprocess. \
-            Popen("java "
-                  "-classpath bin:target/jserver-jar-with-dependencies.jar "
-                  "JavaBridge " +
+        self.__sp = subprocess.Popen("java -jar " + sys.argv[1] + " " +
                   str(port), shell=True)
 
         time.sleep(5)

@@ -6,6 +6,7 @@
     <groupId>com</groupId>
     <artifactId>javajup</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <dependencies>
                         <!-- https://mvnrepository.com/artifact/net.sf.py4j/py4j -->
 	<dependency>
@@ -15,7 +16,6 @@
 	</dependency>
 
     </dependencies>
-
     <build>
     <outputDirectory>./bin</outputDirectory>
     <finalName>jserver</finalName>
@@ -30,20 +30,26 @@
           <target>9</target>
         </configuration>
       </plugin>
-      <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-assembly-plugin</artifactId>
-      <configuration>
-        <archive>
-          <manifest>
-            <mainClass>fully.qualified.JavaBridge</mainClass>
-          </manifest>
-        </archive>
-        <descriptorRefs>
-          <descriptorRef>jar-with-dependencies</descriptorRef>
-        </descriptorRefs>
-      </configuration>
-    </plugin>
+        <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>JavaBridge</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
-  </build>
+    </build>
 </project>
