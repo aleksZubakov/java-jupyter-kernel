@@ -3,15 +3,17 @@
 # How to install
 
 First of all, you should install Jupyter. 
+
 Then launch (root privilegies might requried)
-```./setup.py install``` If all goes fine, setup.py will find path,
-where to specify Java kernel. (It calls "jupyter kernelspec list" 
-and takes path from it.) If finding path fails, you'll be asked to specify
-path manually (i.e. /usr/local/share/jupyter/kernels).
+```
+./setup.py install
+``` 
+If all goes fine, setup.py will find path, where to specify Java kernel. (It calls "jupyter kernelspec list"  and takes path from it.) If finding path fails, you'll be asked to specify
+path manually (i.e. ```/usr/local/share/jupyter/kernels```).
 
 
-Files in repository include file java_src/target/jserver.jar . If you want to rebuild
-it, run "mvn clean install" in directory java_src.
+Files in repository include file ```java_src/target/jserver.jar``` . If you want to rebuild
+it, run ```mvn clean install``` in directory ```java_src```.
 
 ### Existing repos
 
