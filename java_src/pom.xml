@@ -19,7 +19,7 @@
     <build>
     <outputDirectory>./bin</outputDirectory>
     <finalName>jserver</finalName>
-    <sourceDirectory>./java2py</sourceDirectory>
+    <sourceDirectory>./</sourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

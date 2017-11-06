@@ -5,7 +5,6 @@ from setuptools import setup, find_packages
 import subprocess, re, os
 
 if __name__ == "__main__":
-    #subprocess.call("mvn clean install",shell = True)
 
     pth_re = re.compile(r'\S*jupyter/kernels/')
 
@@ -33,7 +32,7 @@ if __name__ == "__main__":
           install_requires=[
               "py4j",
           ],
-          data_files=[(path, ['kernel.py','target/jserver.jar'])]
+          data_files=[(path, ['java_kernel/kernel.py','java_src/target/jserver.jar'])]
  	)
 
     print("Setup, maybe, done in directory\n" + path)
