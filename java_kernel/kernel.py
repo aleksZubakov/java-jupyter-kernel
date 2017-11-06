@@ -17,7 +17,7 @@ class JavaKernel(Kernel):
     implementation_version = '1.0'
     language = 'Java'
     language_version = 'Java 9'
-    language_info = {'mimetype': 'text/plain'}
+    language_info = {'mimetype': 'text/plain', 'name':'Java'}
     banner = "Java kernel for Jupyter"
 
     def __init__(self, **kwargs):
