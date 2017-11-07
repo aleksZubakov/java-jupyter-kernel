@@ -1,7 +1,7 @@
 # java-jupyter-kernel
 
 ## Setup
-First of all, you should install ```jupyter``` : [installing jupyter](http://jupyter.readthedocs.io/en/latest/install.html) and JDK 9 or later.
+First of all, you should install ```jupyter``` : [installing jupyter](http://jupyter.readthedocs.io/en/latest/install.html) and JDK 9.0.1 or later.
 
 Then launch (root privilegies might requried)
 ```
