@@ -151,6 +151,11 @@ public class JShellWrapper {
       return result.toString();
     }
 
+    public String addLibrary(String code){
+      jShell.addToClasspath(code);
+      return "";
+    }
+
     public boolean isComplete(String msg) {
         return srcAnalyzer.analyzeCompletion(msg).completeness().isComplete();
     }

@@ -66,6 +66,12 @@ class JavaKernel(Kernel):
                     'name': 'stdout',
                     'text': self.__java_bridge.getMethods()
                 }
+            elif re.search(r'^/env .*', code) is not None:
+                path = re.sub(r'^/env *', "", code)
+                stream_content = {
+                    'name': 'stdout',
+                    'text': self.__java_bridge.addLibrary(path)
+                }
             else:
                 stream_content = {
                     'name': 'stdout',
@@ -104,11 +110,9 @@ class JavaKernel(Kernel):
         return content
 
     def do_shutdown(self, restart):
-        # self.__java_bridge.shutdown()
         self.__sp.kill()
 
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp
-
     IPKernelApp.launch_instance(kernel_class=JavaKernel)
