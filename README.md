@@ -1,11 +1,24 @@
 # java-jupyter-kernel
 
+## Setup
+First of all, you should install ```jupyter``` : [installing jupyter](http://jupyter.readthedocs.io/en/latest/install.html) and JDK 9.0.1 or later.
 
-### Existing repos
+Then launch (root privilegies might requried)
+```
+./setup.py install
+``` 
+If all goes fine, setup.py will find path, where to specify Java kernel. (It calls "jupyter kernelspec list"  and takes path from it.) If finding path fails, you'll be asked to specify
+path manually (i.e. ```/usr/local/share/jupyter/kernels```).
 
- - https://github.com/scijava/scijava-jupyter-kernel — конвертит в js(_не ок_), но работает:)
- - https://github.com/Bachmann1234/java9_kernel — написан на python, не работает (The kernel as of now is not working. Unclear on why.)
+## Development
+Files in repository include file ```java_src/target/jserver.jar``` . If you want to change or/and rebuild
+it, run 
+```
+cd java_src
+mvn clean install
+``` 
 
- - https://github.com/imatlab/imatlab — matlab, написан на python
- 
- - https://github.com/ligee/kotlin-jupyter — kotlin, написан на kotlin:)
+## Authors
+- [@pvktk](https://github.com/pvktk)
+- [@aleksZubakov](https://github.com/aleksZubakov)
+- [@cripson1994](https://github.com/cripson1994)
