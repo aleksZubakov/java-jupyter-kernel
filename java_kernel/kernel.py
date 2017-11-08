@@ -110,7 +110,7 @@ class JavaKernel(Kernel):
         return content
 
     def do_shutdown(self, restart):
-        self.__sp.kill()
+        self.__sp.terminate()
 
 
 if __name__ == '__main__':
